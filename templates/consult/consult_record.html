@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% load web %}
+{% block content %}
+
+    <section class="content">
+
+            <div class="card-header">
+                <div class="card-title">
+                    {% if 'consult_record_add'| has_permission:request %}
+                    <a  href="/consult_record/add/" class="btn btn-danger btn-sm">添加跟进记录</a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                </div>
+                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                       aria-describedby="example2_info">
+                    <thead>
+                    <tr>
+                            <th>编号</th>
+                            <th>客户姓名</th>
+                            <th>当前状态</th>
+                            <th>内容</th>
+                            <th>销售</th>
+                            {% if 'consult_record_edit'| has_permission:request %}
+                                <th>编辑</th>
+                            {% endif %}
+                            {% if 'consult_record_delete'| has_permission:request %}
+                                <th>删除</th>
+                            {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for consult_record in consult_record_list %}
+                        <tr>
+                            <th>{{ forloop.counter }}</th>
+                            <th>{{ consult_record.customer.name }}</th>
+                            <th>{{ consult_record.customer.get_status }}</th>
+                            <th>{{ consult_record.note }}</th>
+                            <th>{{ consult_record.consultant|default:'暂无' }}</th>
+                            {% if 'consult_record_edit'| has_permission:request %}
+                                <th><a href="/consult_record/edit/{{ consult_record.pk }}">编辑</a></th>
+                            {% endif %}
+                            {% if 'consult_record_delete'| has_permission:request %}
+                                <th><a href="http://www.baidu.com">删除</a></th>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    </section>
+
+{% endblock content %}

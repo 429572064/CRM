@@ -1,0 +1,253 @@
+{% extends 'base/base.html' %}
+{% load web %}
+{% block content %}
+
+    <section class="content">
+
+        <div class="card-header">
+            <div class="card-title">
+            </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div class="row">
+                <!-- /员工表 -->
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">员工列表</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>编号</th>
+                                    <th>员工姓名</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for user in user_list %}
+                                    <tr>
+                                        <th>{{ forloop.counter }}</th>
+                                        <th><a href="?uid={{ user.pk }}">{{ user }}</a></th>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /角色表 -->
+                <div class="col-3">
+                    <div class="card">
+                        <form method="post">
+                            <div class="card-header">
+                                <h3 class="card-title">角色列表</h3>
+
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm" style="width: 80px;">
+                                        <input type="submit" name="table_search" class="form-control float-right"
+                                               placeholder="Search" value="保存">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0">
+
+                                <input type="hidden" name="postType" value="role">
+                                {% csrf_token %}
+                                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                                       aria-describedby="example2_info">
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="select_all" class="select_customer"></th>
+
+                                        <th>编号</th>
+                                        <th>角色</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for role in role_list %}
+                                        <tr>
+                                            {% if role.id in role_id_list %}
+                                                <th><input type="checkbox" name="roles" value="{{ role.id }}" checked>
+                                                </th>
+                                            {% else %}
+                                                <th><input type="checkbox" name="roles" value="{{ role.id }}"></th>
+                                            {% endif %}
+                                            <th>{{ forloop.counter }}</th>
+                                            <th><a href="?{% gen_role_url request role.id %}">{{ role }}</a></th>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </form>
+
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /权限表 -->
+                <div class="col-6">
+                    <div class="card">
+                        <form method="post">
+                            <div class="card-header">
+                                <h3 class="card-title">权限列表</h3>
+
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm" style="width: 80px;">
+                                        <input type="submit" name="table_search" class="form-control float-right"
+                                               placeholder="Search" value="保存">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0">
+
+                                <input type="hidden" name="postType" value="permission">
+                                {% csrf_token %}
+                                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                                       aria-describedby="example2_info">
+                                    <tbody id="permission_table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+
+            </div>
+        </div>
+        </form>
+    </section>
+    {{ page_html|safe }}
+
+{% endblock content %}
+{% block js %}
+    <script>
+        $('#select_all').click(function () {
+            if ($(this).prop('checked')) {
+                $('.select_customer').prop('checked', true)
+            } else {
+                $('.select_customer').prop('checked', false)
+            }
+        });
+        $.ajax({
+            url: '/rbac/permission_tree/',
+            type: 'get',
+            success: function (res) {
+
+                $.each(res, function (i, permission) {
+
+                    var menu_title = permission['menu__title'];
+                    var menu_pk = permission['menu__pk'];
+                    var url = permission['url'];
+                    var pid = permission['pid'];
+                    var pk = permission['pk'];
+                    var title = permission['title'];
+                    if (menu_title) {
+                        if ($("#menu_" + menu_pk).length) {
+                            var s = `
+                            <tr class='node' id= 'per_${pk}'>
+                                <td><input name='permission_id' value='${pk}' type='checkbox'>${title}</td>
+                            </tr>`;
+                            $("#menu_" + menu_pk).parent().append(s);
+                        } else {
+                            var s = `<tr class='root' id='menu_${menu_pk}'><td>${menu_title}</td></tr>
+                            <tr class='node' id="per_${pk}">
+                               <td><input name="permission_id" value='${pk}' type="checkbox">${title}</td>
+                            <tr>`;
+                            $("#permission_table").append(s);
+                        }
+                    } else {
+                        var s = `
+                        <td><input name="permission_id" value='${pk}' type="checkbox">${title}</td>
+                        `;
+                        $("#per_" + pid).append(s);
+                    }
+                });
+                var per_id_list = {{ per_id_list }}
+                    $.each(per_id_list, function (i, j) {
+                        $("#permission_table [value='" + j + "']").prop('checked', true)
+                    })
+            }
+        })
+
+    </script>
+{% endblock %}
+
+<!-- /.员工表 -->
+<div id="example2_wrapper" class="col-md-3 dataTables_wrapper container-fluid dt-bootstrap4">
+
+    <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+           aria-describedby="example2_info">
+        <thead>
+        <tr>
+            <th>编号</th>
+            <th>员工姓名</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in user_list %}
+            <tr>
+                <th>{{ forloop.counter }}</th>
+                <th><a href="?uid={{ user.pk }}">{{ user }}</a></th>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+<!-- /.角色表 -->
+<div id="example2_wrapper" class="col-md-3 dataTables_wrapper container-fluid dt-bootstrap4">
+    <form method="post">
+        <input type="hidden" name="postType" value="role">
+        {% csrf_token %}
+        <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+               aria-describedby="example2_info">
+            <thead>
+            <tr>
+                <th><input type="checkbox" id="select_all" class="select_customer"></th>
+
+                <th>编号</th>
+                <th>角色</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for role in role_list %}
+                <tr>
+                    {% if role.id in role_id_list %}
+                        <th><input type="checkbox" name="roles" value="{{ role.id }}" checked></th>
+                    {% else %}
+                        <th><input type="checkbox" name="roles" value="{{ role.id }}"></th>
+                    {% endif %}
+                    <th>{{ forloop.counter }}</th>
+                    <th><a href="?{% gen_role_url request role.id %}">{{ role }}</a></th>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" class="btn btn-primary" value="保存">
+    </form>
+</div>
+<!-- /.权限表 -->
+<div id="example2_wrapper" class="col-md-6   dataTables_wrapper container-fluid dt-bootstrap4">
+    <form method="post">
+        <input type="hidden" name="postType" value="permission">
+        {% csrf_token %}
+        <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+               aria-describedby="example2_info">
+            <tbody id="permission_table">
+            </tbody>
+        </table>
+        <input type="submit" class="btn btn-primary" value="保存">
+    </form>
+</div>

@@ -1,0 +1,56 @@
+{#<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">#}
+<!-- Sidebar Menu -->
+<nav class="mt-2">
+
+    <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu"
+        data-accordion="false">
+        {% for item in permission_menu_dict.values %}
+            {% if item.menu_id == request.current_menu_id %}
+                 <li class="nav-item has-treeview menu-open">
+                    <a href="#" class="menu_title nav-link">
+                        <i class="nav-icon fa fa-dashboard"></i>
+                        <p>
+                            {{ item.menu_title }}
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="menu_body nav nav-treeview" style="display: block;">
+                        {% for foo in item.children %}
+                            <li class="nav-item">
+                                <a href="{{ foo.url }}" class="nav-link">
+                                    <i class="fa fa-circle-o nav-icon"></i>
+                                    <p>{{ foo.title }}</p>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% else %}
+                 <li class="nav-item has-treeview">
+                <a href="#" class="menu_title nav-link">
+                    <i class="nav-icon fa fa-dashboard"></i>
+                    <p>
+                        {{ item.menu_title }}
+                        <i class="right fa fa-angle-left"></i>
+                    </p>
+                </a>
+
+                <ul class="menu_body nav nav-treeview">
+                    {% for foo in item.children %}
+                        <li class="nav-item">
+                            <a href="{{ foo.url }}" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>{{ foo.title }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <script>
+    </script>
+</nav>
+<!-- /.sidebar-menu -->

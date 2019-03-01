@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+    <section class="content">
+
+        <!-- 批量处理的表单 -->
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="card-header">
+                <div class="card-title">
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                </div>
+                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                       aria-describedby="example2_info">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>姓名</th>
+                        <th>考勤</th>
+                        <th>成绩</th>
+                        <th>批语</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <form>
+                    {% for student_study_record in student_study_record_list %}
+                        <tr>
+                            <th>{{ forloop.counter }}</th>
+                            <th>{{ student_study_record.student }}</th>
+                            <th>{{ student_study_record.get_record_display }}</th>
+                            <th><select class="form-control" style="width: 80px" name="{{ student_study_record.pk }}" id="">
+                                <option value="">-----</option>
+                                {% for choice in choice_list %}
+                                    {% if choice.0 == student_study_record.score %}
+                                        <option  selected='selected' value={{ choice.0 }}>{{ choice.1 }}</option>
+                                    {% else %}
+                                        <option value={{ choice.0 }}>{{ choice.1 }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+
+
+
+                            </select></th>
+                            <th><input type="text" value="{{ student_study_record.homework_note }}" class="form-control" name="{{ student_study_record.pk }}"></th>
+                        </tr>
+                        </form>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <input type="submit" class="pull-right btn btn-success" style="margin-right:22px ;" value="保存">
+        </form>
+    </section>
+    {{ page_html|safe }}
+
+{% endblock content %}
+{% block js %}
+    <script>
+        $('#select_all').click(function () {
+            if($(this).prop('checked')){
+                $('.select_customer').prop('checked', true)
+            }else{
+                $('.select_customer').prop('checked', false)
+            }
+        })
+    </script>
+{% endblock %}

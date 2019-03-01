@@ -1,0 +1,27 @@
+`       <!-- 内容头 -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                {% for li in breadcrumb_list %}
+                    {% if forloop.last %}
+                        <h1>{{ li.title }}</h1>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="col-sm-6">
+                <!-- 面包屑 -->
+                <ol class="breadcrumb float-sm-right">
+                    {% for li in breadcrumb_list %}
+                        {% if forloop.last %}
+                            <li class="breadcrumb-item active">{{ li.title }}</li>
+                        {% else %}
+                            <li class="breadcrumb-item"><a href="{{ li.url }}">{{ li.title }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+
+            </div>
+        </div>
+    </div>
+</section>

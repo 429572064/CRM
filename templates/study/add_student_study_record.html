@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+
+    <section class="content">
+
+        <div class="card-header">
+            <div class="card-title">
+            </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <form action="" method="post" novalidate>
+                                {% csrf_token %}
+                                {% for field in form %}
+                                    <div class="form-group">
+                                        <label for="title">{{ field.label }}</label>
+                                        {{ field }}
+                                        <span>{{ field.errors.0 }}</span>
+                                    </div>
+                                {% endfor %}
+                                <input type="submit" class="btn btn-primary pull-right">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock content %}

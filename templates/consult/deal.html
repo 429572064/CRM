@@ -1,0 +1,101 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+    <section class="content">
+        <div class="card-header">
+            <div class="card-title">
+
+                <form action="" style="margin-right: 20px;" method="get" class="d-inline-block pull-right">
+                    <select name="date" id="" style="display:inline-block;width:80px;margin-right: -4px;"
+                            class="form-control form-control-sm">
+                        <option value="today">今天</option>
+                        <option value="yesterday">昨天</option>
+                        <option value="last_week">过去七天</option>
+                    </select>
+                    <button style="vertical-align: 0px;margin-left:-5px;" class="btn btn-success btn-sm">go</button>
+                </form>
+            </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+            </div>
+            <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                   aria-describedby="example2_info">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>客户姓名</th>
+                    <th>销售</th>
+                    <th>班级类型</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for customer in customer_list %}
+                    <tr>
+                        <th>{{ forloop.counter }}</th>
+                        <th>{{ customer.name }}</th>
+                        <th>{{ customer.consultant|default:'暂无' }}</th>
+                        <th>{{ customer.get_class_type_display }}</th>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div id="container" style="height: 400px; width:600px"></div>
+        </div>
+    </section>
+
+{% endblock content %}
+{% block js %}
+
+        <script>
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            app.title = '坐标轴刻度与标签对齐';
+
+            option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        name: '销售人',
+                        type: 'category',
+                        data: {{ coordinate|safe }},
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '成单量',
+                        type: 'bar',
+                        barWidth: '25%',
+                        data:{{ data|safe }}
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
+        </script>
+    {% endblock %}

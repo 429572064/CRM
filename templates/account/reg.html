@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <script src="/static/js/jquery.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h3>用户注册</h3>
+
+            <form novalidate>
+                {% csrf_token %}
+                {% for field in regist_form %}
+                    <div class="form-group">
+                        <label for="">{{ field.label }}</label>
+                        {{ field }} <span class="error">{{ field.errors.0 }}</span>
+                        {% if field.label == "确认密码" %}
+                            <span class="error">{{ g_error|default:"" }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <a href="/login/" class="btn btn-success pull-left">登录</a>
+                <span id='submit' class="btn btn-success pull-right">提交</span>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('#submit').click(function () {
+        $.ajax({
+            url: '',
+            type: 'post',
+            data: {
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                username: $('#id_username').val(),
+                password: $('#id_password').val(),
+                r_pwd: $('#id_r_pwd').val(),
+                email: $('#id_email').val()
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.user) {
+                    location.href="/login/";
+                } else {
+                    console.log(123);
+                    $('.error').html('');
+                    $('input').removeClass('has-error');
+                    $.each(response.errors, function (i, j) {
+                        $('#id_' + i).next().html(j[0]).css('color', 'red').parent().addClass('has-error')
+                    })
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

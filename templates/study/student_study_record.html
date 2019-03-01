@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+{% load web %}
+{% block content %}
+
+    <section class="content">
+        <!-- 模糊查询的表单 -->
+
+        <!-- 批量处理的表单 -->
+        <form  method="post">
+            {% csrf_token %}
+            <select   name="action" id="" style="display:inline-block;width: 200px;margin-left: 20px;" class="form-control form-control-sm">
+                <option value="">请选择批量处理方法</option>
+                <option value="patch_create">批量创建学生学习记录</option>
+                <option value="patch_delete">批量删除</option>
+            </select>
+            <button style="vertical-align: 0px;margin-left:-5px;" class="btn btn-primary btn-sm">go</button>
+            <div class="card-header">
+                <div class="card-title">
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                </div>
+                <a href="/student_study_record/add/{{ next }}" class="btn btn-success">添加学生学习记录</a>
+                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                       aria-describedby="example2_info">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select_all" class="select_student_study_record"></th>
+                        <th>编号</th>
+                        <th>学员</th>
+                        <th>第几天课程</th>
+                        <th>出勤</th>
+                        <th>本节成绩</th>
+                        <th>作业评语</th>
+                        {% if 'student_study_record_delete'| has_permission:request %}
+                            <th>删除</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for student_study_record in student_study_record_list %}
+                        <tr>
+                            <th><input name="select_student_study_record_pk" type="checkbox" class="select_student_study_record"
+                                       value={{ student_study_record.pk }}></th>
+                            <th>{{ forloop.counter }}</th>
+                            <th>{{ student_study_record.student }}</th>
+                            <th>{{ student_study_record.classstudyrecord }}</th>
+                            <th>{{ student_study_record.get_record_display }}</th>
+                            <th>{{ student_study_record.score }}</th>
+                            <th>{{ student_study_record.homework_note }}</th>
+                            {% if 'student_study_record_delete'| has_permission:request %}
+                                <th><a href="/student_study_record/delete/{{ student_study_record.pk }}/{{ next }}">删除</a></th>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </section>
+    {{ page_html|safe }}
+
+{% endblock content %}
+{% block js %}
+    <script>
+        $('#select_all').click(function () {
+            if($(this).prop('checked')){
+                $('.select_student_study_record').prop('checked', true)
+            }else{
+                $('.select_student_study_record').prop('checked', false)
+            }
+        })
+    </script>
+{% endblock %}

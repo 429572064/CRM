@@ -1,0 +1,109 @@
+{% extends 'base/base.html' %}
+{% load web %}
+{% block content %}
+
+    <section class="content">
+        <!-- 模糊查询的表单 -->
+        <form action="" style= "margin-right: 20px;" method="get" class="d-inline-block pull-right">
+            <select name="field" id="" style="display:inline-block;width:80px;margin-right: -4px;"
+                    class="form-control form-control-sm">
+                <option value="name">姓名</option>
+                <option value="qq">qq</option>
+                <option value="phone">手机</option>
+                <option value="status">状态</option>
+            </select>
+            <input name="q" type="text" class="form-control form-control-sm" style="display:inline-block;width: 200px;">
+            <button style="vertical-align: 0px;margin-left:-5px;" class="btn btn-success btn-sm">go</button>
+        </form>
+        <!-- 批量处理的表单 -->
+        <form  method="post">
+            {% csrf_token %}
+            <select     name="action" id="" style="display:inline-block;width: 200px;margin-left: 20px;" class="form-control form-control-sm">
+                <option value="">请选择批量处理方法</option>
+                <option value="patch_delete">删除所选数据</option>
+                <option value="patch_reverse_gs">公户转私户</option>
+                <option value="patch_reverse_sg">私户转公户</option>
+            </select>
+            <button style="vertical-align: 0px;margin-left:-5px;" class="btn btn-primary btn-sm">go</button>
+            <div class="card-header">
+                <div class="card-title">
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                </div>
+                {% if 'customer_add'|has_permission:request %}
+                    <a href="/customer/add/{{ next }}" class="btn btn-success">添加客户信息</a>
+                {% endif %}
+                <table id="example2" class="table table-bordered table-hover dataTable" role="grid"
+                       aria-describedby="example2_info">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select_all" class="select_customer"></th>
+                        <th>编号</th>
+                        <th>客户姓名</th>
+                        <th>性别</th>
+                        <th>QQ</th>
+                        <th>手机号</th>
+                        <th>客户来源</th>
+                        <th>咨询日期</th>
+                        <th>当前状态</th>
+                        <th>销售</th>
+                        <th>所报班级</th>
+                        {% if 'consult_record'|has_permission:request %}
+                            <th>跟进记录</th>
+                        {% endif %}
+                        {% if 'customer_edit'|has_permission:request %}
+                            <th>编辑</th>
+                        {% endif %}
+                        {% if 'customer_delete'|has_permission:request %}
+                            <th>删除</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for customer in customer_list %}
+                        <tr>
+                            <th><input name="select_customer_pk" type="checkbox" class="select_customer"
+                                       value={{ customer.pk }}></th>
+                            <th>{{ forloop.counter }}</th>
+                            <th>{{ customer.name }}</th>
+                            <th>{{ customer.get_sex_display }}</th>
+                            <th>{{ customer.qq }}</th>
+                            <th>{{ customer.phone }}</th>
+                            <th>{{ customer.get_source_display }}</th>
+                            <th>{{ customer.date|date:"Y-m-d" }}</th>
+                            <th>{{ customer.get_status }}</th>
+                            <th>{{ customer.consultant|default:'暂无' }}</th>
+                            <th>{{ customer.get_classlist|default:'暂无' }}</th>
+                            {% if 'consult_record'|has_permission:request %}
+                                <th><a href="/consult_record/?customer_id={{ customer.pk }}">跟进详情</a></th>
+                            {% endif %}
+                            {% if 'customer_edit'|has_permission:request %}
+                                <th><a href="/customer/edit/{{ customer.pk }}{{ next }}">编辑</a></th>
+                            {% endif %}
+                            {% if 'customer_delete'|has_permission:request %}
+                                <th><a href="http://www.baidu.com">删除</a></th>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </section>
+    {{ page_html|safe }}
+
+{% endblock content %}
+{% block js %}
+    <script>
+        $('#select_all').click(function () {
+            if($(this).prop('checked')){
+                $('.select_customer').prop('checked', true)
+            }else{
+                $('.select_customer').prop('checked', false)
+            }
+        })
+    </script>
+{% endblock %}
